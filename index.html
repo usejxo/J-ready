@@ -44,7 +44,7 @@
     </script>
 </head>
 <body>
-    <img src="/icons/images/icon.png" alt="J-Ready Logo">
+    <img src="J-ready/icons/images/icon.png" alt="J-Ready Logo">
     <h1>J-Ready</h1>
     <p>The best I-Ready client out there.</p>
     <button id="installBtn">Install J-Ready</button>
@@ -77,10 +77,10 @@
             event.waitUntil(
                 caches.open(CACHE_NAME).then((cache) => {
                     return cache.addAll([
-                        "/",
-                        "/index.html",
-                        "/manifest.json",
-                        "/icons/images/icon.png"
+                        "/J-ready/",
+                        "/J-ready/index.html",
+                        "/J-ready/manifest.json",
+                        "/J-ready/icons/images/icon.png"
                     ]);
                 })
             );
@@ -96,7 +96,7 @@
                             return networkResponse;
                         });
                     });
-                }).catch(() => caches.match("/index.html"))
+                }).catch(() => caches.match("J-ready/index.html"))
             );
         });
 
