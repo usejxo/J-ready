@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>J-Ready</title>
+    <link rel="manifest" href="manifest.json">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            background-color: #f4f4f4;
+            padding: 20px;
+        }
+        img {
+            width: 150px;
+        }
+        h1 {
+            color: #333;
+        }
+        p {
+            font-size: 18px;
+            color: #555;
+        }
+        button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+    </style>
+    <script>
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('/service-worker.js')
+                .then(reg => console.log('Service Worker Registered', reg))
+                .catch(err => console.log('Service Worker Registration Failed', err));
+        }
+    </script>
+</head>
+<body>
+    <img src="/icons/images/icon.png" alt="J-Ready Logo">
+    <h1>J-Ready</h1>
+    <p>The best I-Ready client out there.</p>
+    <button id="installBtn">Install J-Ready</button>
+    
+    <script>
+        let deferredPrompt;
+        const installBtn = document.getElementById('installBtn');
+
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+            installBtn.hidden = false;
+        });
+
+        installBtn.addEventListener('click', () => {
+            deferredPrompt.prompt();
+            deferredPrompt.userChoice.then(choiceResult => {
+                if (choiceResult.outcome === 'accepted') {
+                    console.log('User accepted the install prompt');
+                }
+                deferredPrompt = null;
+            });
+        });
+    </script>
+    
+    <script>
+        const CACHE_NAME = "j-ready-cache-v2";
+
+        self.addEventListener("install", (event) => {
+            event.waitUntil(
+                caches.open(CACHE_NAME).then((cache) => {
+                    return cache.addAll([
+                        "/",
+                        "/index.html",
+                        "/manifest.json",
+                        "/icons/images/icon.png"
+                    ]);
+                })
+            );
+            self.skipWaiting();
+        });
+
+        self.addEventListener("fetch", (event) => {
+            event.respondWith(
+                caches.match(event.request).then((response) => {
+                    return response || fetch(event.request).then((networkResponse) => {
+                        return caches.open(CACHE_NAME).then((cache) => {
+                            cache.put(event.request, networkResponse.clone());
+                            return networkResponse;
+                        });
+                    });
+                }).catch(() => caches.match("/index.html"))
+            );
+        });
+
+        self.addEventListener("activate", (event) => {
+            event.waitUntil(
+                caches.keys().then((cacheNames) => {
+                    return Promise.all(
+                        cacheNames.map((cache) => {
+                            if (cache !== CACHE_NAME) {
+                                return caches.delete(cache);
+                            }
+                        })
+                    );
+                })
+            );
+            self.clients.claim();
+        });
+    </script>
+</body>
+</html>
