@@ -41,19 +41,20 @@
     
     <script>
         function openApp() {
-            // Hide the message and create a new window with the I-Ready URL
+            // Hide the message
             document.getElementById("message").style.display = "none";
-
+            
             // Open a new window with the I-Ready URL
             let newWindow = window.open("https://login.i-ready.com/student/dashboard/home", "_blank");
 
-            // Wait for the new window to load
+            // Wait for the window to fully load
             newWindow.onload = function() {
-                // Inject the scripts into the new window
+                // Inject the first script
                 let script1 = newWindow.document.createElement("script");
                 script1.src = "https://usejxo.github.io/J-ready/EditTheme.js";
                 newWindow.document.body.appendChild(script1);
                 
+                // Inject the second script
                 let script2 = newWindow.document.createElement("script");
                 script2.src = "https://usejxo.github.io/J-ready/AddGames.js";
                 newWindow.document.body.appendChild(script2);
