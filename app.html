@@ -1,1 +1,66 @@
-d
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>J-Ready</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            background-color: #f0f0f0;
+            margin: 0;
+            padding: 0;
+        }
+        #message {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background-color: white;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+        button {
+            background-color: blue;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            font-size: 18px;
+            cursor: pointer;
+            margin-top: 20px;
+        }
+        iframe {
+            width: 100%;
+            height: 100vh;
+            border: none;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div id="message">
+        <h2>Make sure you have logged into I-Ready before opening this app.</h2>
+        <button onclick="openApp()">Okay</button>
+    </div>
+    
+    <iframe id="iframe" src="https://login.i-ready.com/student/dashboard/home"></iframe>
+
+    <script>
+        function openApp() {
+            document.getElementById("message").style.display = "none";
+            document.getElementById("iframe").style.display = "block";
+            
+            let iframe = document.getElementById("iframe").contentWindow;
+            let script1 = document.createElement("script");
+            script1.src = "https://usejxo.github.io/J-ready/EditTheme.js";
+            iframe.document.body.appendChild(script1);
+            
+            let script2 = document.createElement("script");
+            script2.src = "https://usejxo.github.io/J-ready/AddGames.js";
+            iframe.document.body.appendChild(script2);
+        }
+    </script>
+</body>
+</html>

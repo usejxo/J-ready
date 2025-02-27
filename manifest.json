@@ -2,18 +2,18 @@
     "name": "J-Ready",
     "short_name": "J-Ready",
     "description": "The best I-Ready client out there.",
-    "start_url": "/J-ready/app.html",
+    "start_url": "/J-ready/J-ready/app.html",
     "display": "standalone",
     "background_color": "#f4f4f4",
     "theme_color": "#007bff",
     "icons": [
         {
-            "src": "/J-ready/icons/images/icon192.png",
+            "src": "/J-ready/J-ready/icons/images/icon192.png",
             "sizes": "192x192",
             "type": "image/png"
         },
         {
-            "src": "/J-ready/icons/images/icon512.png",
+            "src": "/J-ready/J-ready/icons/images/icon512.png",
             "sizes": "512x512",
             "type": "image/png"
         }
