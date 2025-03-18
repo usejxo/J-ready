@@ -3,74 +3,120 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>J-Ready</title>
+  <title>J-Ready Injection Helper</title>
   <style>
     body {
       font-family: Arial, sans-serif;
-      text-align: center;
       background-color: #f0f0f0;
       margin: 0;
-      padding: 0;
+      padding: 20px;
     }
-    #message {
-      position: absolute;
-      width: 100%;
-      height: 100%;
-      background-color: white;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
+    #message, #instructions {
+      max-width: 600px;
+      margin: 50px auto;
+      background: #fff;
+      padding: 20px;
+      border-radius: 8px;
+      text-align: center;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.2);
     }
     button {
       background-color: blue;
-      color: white;
+      color: #fff;
       border: none;
       padding: 10px 20px;
-      font-size: 18px;
+      font-size: 16px;
       cursor: pointer;
       margin-top: 20px;
+      border-radius: 4px;
+    }
+    textarea {
+      width: 100%;
+      height: 220px;
+      margin-top: 20px;
+      font-family: Consolas, monospace;
+      font-size: 13px;
+      padding: 10px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      resize: none;
+    }
+    a {
+      color: blue;
+      text-decoration: underline;
     }
   </style>
 </head>
 <body>
   <div id="message">
-    <h2>Make sure you have logged into I-Ready before opening this app.</h2>
-    <button onclick="openApp()">Okay</button>
+    <h2>Before You Begin</h2>
+    <p>Please make sure you are logged into I‑Ready.</p>
+    <button onclick="showInstructions()">Okay</button>
+  </div>
+
+  <div id="instructions" style="display: none;">
+    <h2>Injection Instructions</h2>
+    <p>
+      1. Open the I‑Ready page: <a href="https://login.i-ready.com/student/dashboard/home" target="_blank">I‑Ready Login</a>.<br>
+      2. Once the page loads, right-click and select “Inspect” (or use a two‐finger tap on your touchpad) and switch to the Console tab.<br>
+      3. Click inside the code box below, press <strong>Ctrl+A</strong> to select all, then <strong>Ctrl+C</strong> to copy the script.<br>
+      4. Paste it into the Console (using <strong>Ctrl+V</strong>) and press Enter.<br>
+      5. A GUI will appear on the I‑Ready page displaying the status of both injected scripts. (If you don’t see it, press <strong>Ctrl+Shift+J</strong> to open Developer Tools.)
+    </p>
+    <textarea readonly id="copyScript">
+(function(){
+  function createStatusGUI() {
+    var gui = document.createElement('div');
+    gui.style.position = 'fixed';
+    gui.style.bottom = '10px';
+    gui.style.right = '10px';
+    gui.style.backgroundColor = 'rgba(0,0,0,0.7)';
+    gui.style.color = '#fff';
+    gui.style.padding = '10px';
+    gui.style.zIndex = '9999';
+    gui.style.fontFamily = 'Arial, sans-serif';
+    gui.style.fontSize = '14px';
+    gui.innerHTML = '<strong>Status:</strong><br>';
+    gui.id = 'injectionStatusGUI';
+    document.body.appendChild(gui);
+    return gui;
+  }
+
+  function updateStatus(gui) {
+    var script1 = document.querySelector('script[src="https://usejxo.github.io/J-ready/EditTheme.js"]');
+    var script2 = document.querySelector('script[src="https://usejxo.github.io/J-ready/AddGames.js"]');
+    var status1 = script1 ? 'Injected' : 'Not Injected';
+    var status2 = script2 ? 'Injected' : 'Not Injected';
+    gui.innerHTML = '<strong>Status:</strong><br>' +
+      'EditTheme.js: ' + status1 + '<br>' +
+      'AddGames.js: ' + status2 + '<br>' +
+      '<em>Press Ctrl+Shift+J to view this GUI</em>';
+  }
+
+  var gui = document.getElementById('injectionStatusGUI') || createStatusGUI();
+  updateStatus(gui);
+
+  if (!document.querySelector('script[src="https://usejxo.github.io/J-ready/EditTheme.js"]')) {
+    var s1 = document.createElement('script');
+    s1.src = "https://usejxo.github.io/J-ready/EditTheme.js";
+    s1.onload = function(){ updateStatus(gui); };
+    document.body.appendChild(s1);
+  }
+  if (!document.querySelector('script[src="https://usejxo.github.io/J-ready/AddGames.js"]')) {
+    var s2 = document.createElement('script');
+    s2.src = "https://usejxo.github.io/J-ready/AddGames.js";
+    s2.onload = function(){ updateStatus(gui); };
+    document.body.appendChild(s2);
+  }
+})();
+    </textarea>
+    <p>You can copy the script by clicking inside the box, pressing <strong>Ctrl+A</strong>, then <strong>Ctrl+C</strong>.</p>
   </div>
 
   <script>
-    // Utility to inject a script and log its success or failure
-    function injectScript(win, src) {
-      const script = win.document.createElement("script");
-      script.src = src;
-      script.onload = () => console.log(`Successfully loaded ${src}`);
-      script.onerror = () => console.error(`Failed to load ${src}`);
-      win.document.body.appendChild(script);
-    }
-
-    function openApp() {
-      // Hide the message
-      document.getElementById("message").style.display = "none";
-
-      // Open a new window with the I-Ready URL
-      const newWindow = window.open("https://login.i-ready.com/student/dashboard/home", "_blank");
-
-      // Use an interval to check when we can access newWindow.document
-      const intervalId = setInterval(() => {
-        try {
-          // Check if the document is accessible and fully loaded
-          if (newWindow.document && newWindow.document.readyState === "complete") {
-            clearInterval(intervalId);
-            // Independently inject both scripts
-            injectScript(newWindow, "https://usejxo.github.io/J-ready/EditTheme.js");
-            injectScript(newWindow, "https://usejxo.github.io/J-ready/AddGames.js");
-          }
-        } catch (e) {
-          // Accessing newWindow.document may throw a cross-origin error
-          console.warn("Waiting for newWindow to become accessible...", e);
-        }
-      }, 100);
+    function showInstructions() {
+      document.getElementById('message').style.display = 'none';
+      document.getElementById('instructions').style.display = 'block';
     }
   </script>
 </body>
