@@ -1,65 +1,77 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>J-Ready</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            text-align: center;
-            background-color: #f0f0f0;
-            margin: 0;
-            padding: 0;
-        }
-        #message {
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            background-color: white;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-        }
-        button {
-            background-color: blue;
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            font-size: 18px;
-            cursor: pointer;
-            margin-top: 20px;
-        }
-    </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>J-Ready</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      background-color: #f0f0f0;
+      margin: 0;
+      padding: 0;
+    }
+    #message {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      background-color: white;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+    }
+    button {
+      background-color: blue;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      font-size: 18px;
+      cursor: pointer;
+      margin-top: 20px;
+    }
+  </style>
 </head>
 <body>
-    <div id="message">
-        <h2>Make sure you have logged into I-Ready before opening this app.</h2>
-        <button onclick="openApp()">Okay</button>
-    </div>
-    
-    <script>
-        function openApp() {
-            // Hide the message
-            document.getElementById("message").style.display = "none";
-            
-            // Open a new window with the I-Ready URL
-            let newWindow = window.open("https://login.i-ready.com/student/dashboard/home", "_blank");
+  <div id="message">
+    <h2>Make sure you have logged into I-Ready before opening this app.</h2>
+    <button onclick="openApp()">Okay</button>
+  </div>
 
-            // Wait for the window to fully load
-            newWindow.onload = function() {
-                // Inject the first script
-                let script1 = newWindow.document.createElement("script");
-                script1.src = "https://usejxo.github.io/J-ready/EditTheme.js";
-                newWindow.document.body.appendChild(script1);
-                
-                // Inject the second script
-                let script2 = newWindow.document.createElement("script");
-                script2.src = "https://usejxo.github.io/J-ready/AddGames.js";
-                newWindow.document.body.appendChild(script2);
-            };
+  <script>
+    // Utility to inject a script and log its success or failure
+    function injectScript(win, src) {
+      const script = win.document.createElement("script");
+      script.src = src;
+      script.onload = () => console.log(`Successfully loaded ${src}`);
+      script.onerror = () => console.error(`Failed to load ${src}`);
+      win.document.body.appendChild(script);
+    }
+
+    function openApp() {
+      // Hide the message
+      document.getElementById("message").style.display = "none";
+
+      // Open a new window with the I-Ready URL
+      const newWindow = window.open("https://login.i-ready.com/student/dashboard/home", "_blank");
+
+      // Use an interval to check when we can access newWindow.document
+      const intervalId = setInterval(() => {
+        try {
+          // Check if the document is accessible and fully loaded
+          if (newWindow.document && newWindow.document.readyState === "complete") {
+            clearInterval(intervalId);
+            // Independently inject both scripts
+            injectScript(newWindow, "https://usejxo.github.io/J-ready/EditTheme.js");
+            injectScript(newWindow, "https://usejxo.github.io/J-ready/AddGames.js");
+          }
+        } catch (e) {
+          // Accessing newWindow.document may throw a cross-origin error
+          console.warn("Waiting for newWindow to become accessible...", e);
         }
-    </script>
+      }, 100);
+    }
+  </script>
 </body>
 </html>
